@@ -45,8 +45,6 @@ export function createTruckTool({ scene, camera, controls, onStatus }) {
   const matTractor = new THREE.MeshStandardMaterial({ color: '#2f5aa8', roughness: 0.5, metalness: 0.3 });
   const matTrailer = new THREE.MeshStandardMaterial({ color: '#f2f2ee', roughness: 0.6 });
   const matHit = new THREE.MeshStandardMaterial({ color: '#d64545', roughness: 0.6 });
-  const matTrail = new THREE.MeshBasicMaterial({ color: '#ff9f1c', transparent: true, opacity: 0.10, depthWrite: false, side: THREE.DoubleSide });
-  const matTrailHit = new THREE.MeshBasicMaterial({ color: '#d64545', transparent: true, opacity: 0.18, depthWrite: false, side: THREE.DoubleSide });
   const wheelMat = new THREE.MeshStandardMaterial({ color: '#222' });
 
   // unit boxes scaled per vehicle
@@ -109,12 +107,27 @@ export function createTruckTool({ scene, camera, controls, onStatus }) {
     }
     label.position.copy(hitch).addScaledVector(tDir, V.wb1 / 2).setY(yT + 16);
   }
+  // narrow painted tracks instead of a full-width sweep: orange = trailer rear (the line that has to hit the door),
+  // blue = tractor front axle (where the cab goes); red where anything was hitting
+  const matTrackR = new THREE.MeshBasicMaterial({ color: '#ff8c1a', depthTest: false, transparent: true, opacity: 0.95, side: THREE.DoubleSide });
+  const matTrackT = new THREE.MeshBasicMaterial({ color: '#3b82f6', depthTest: false, transparent: true, opacity: 0.9, side: THREE.DoubleSide });
+  const matTrackHit = new THREE.MeshBasicMaterial({ color: '#d64545', depthTest: false, transparent: true, opacity: 0.95, side: THREE.DoubleSide });
+  let lastR = null, lastT = null;
+  function trackSeg(a, b, mat, w) {
+    const dx = b.x - a.x, dz = b.z - a.z, L = Math.hypot(dx, dz); if (L < 0.05) return;
+    const q = new THREE.Mesh(new THREE.PlaneGeometry(L, w), mat);
+    q.position.set((a.x + b.x) / 2, gradeAt((a.x + b.x) / 2) + 0.35, (a.z + b.z) / 2);
+    q.rotation.set(0, 0, 0); q.rotateY(-Math.atan2(dz, dx)); q.rotateX(-Math.PI / 2);
+    q.renderOrder = 998;
+    trail.add(q); if (trail.children.length > MAX_TRAIL * 2) trail.remove(trail.children[0]);
+  }
   function addTrail(hit) {
-    const { hitch, rDir } = pose();
-    const q = new THREE.Mesh(new THREE.PlaneGeometry(V.rFront - V.rRear, HALF_W * 2), hit ? matTrailHit : matTrail);
-    q.position.copy(hitch).addScaledVector(rDir, (V.rFront + V.rRear) / 2); q.position.y = gradeAt(q.position.x) + 0.3;
-    q.rotation.set(0, 0, 0); q.rotateY(-s.psi); q.rotateX(-Math.PI / 2);
-    trail.add(q); if (trail.children.length > MAX_TRAIL) trail.remove(trail.children[0]);
+    const { hitch, tDir, rDir } = pose();
+    const rp = hitch.clone().addScaledVector(rDir, V.rRear);            // trailer rear centre
+    const tp = hitch.clone().addScaledVector(tDir, V.wb1);              // tractor front axle
+    if (lastR) trackSeg(lastR, rp, hit ? matTrackHit : matTrackR, 0.7);
+    if (lastT) trackSeg(lastT, tp, hit ? matTrackHit : matTrackT, 0.45);
+    lastR = rp; lastT = tp;
   }
   function status() {
     const ang = THREE.MathUtils.radToDeg(Math.atan2(Math.sin(s.th - s.psi), Math.cos(s.th - s.psi)));
@@ -131,6 +144,7 @@ export function createTruckTool({ scene, camera, controls, onStatus }) {
     const p = STARTS[startId];
     Object.assign(s, { x: p.x, z: p.z, th: p.th, psi: p.th, phi: 0, v: 0, dist: 0, hits: [] });
     while (trail.children.length) trail.remove(trail.children[0]);
+    lastR = null; lastT = null;
     s.hits = checkHits(corners()); place(); status();
   }
   function setVehicle(id) {
