@@ -24,9 +24,13 @@ export const DOCK_PLANS = {
   'WB-40': { feasible: true, dumpsterMoved: false, note: 'Single swing: pull in 12\', swing right, counter-steer left, straighten, then back to the door. ~209\' of travel, yard as-is.',
     phases: [ { type: 'fwd', segs: [[0, 11.84], [26.7, 48.03], [-27.4, 76.42], [-5.78, 15.99]] }, { type: 'rev', limit: 400 } ] },
   'WB-50': { feasible: true, dumpsterMoved: false, note: 'Single swing using the whole yard width — swing right, hard left, straighten 23\', then back ~100\' to the door. ~221\' of travel. (Needs the back-east corner clear: a dumpster there put the best attempt 11½\' off the door.)',
-    phases: [ { type: 'fwd', segs: [[0, 17.23], [29.6, 57.02], [-32, 75.84], [14.77, 22.97]] }, { type: 'rev', limit: 400 } ] },
+    phases: [ { type: 'fwd', segs: [[0, 17.23], [29.6, 57.02], [-32, 75.84], [14.77, 22.97]] }, { type: 'rev', limit: 400 } ],
+    withEasement: { feasible: true, dumpsterMoved: false, note: 'With the 5\' easement: same single swing with more elbow room on the left — full lock right, full lock left, straighten 32\', back to the door. ~224\' of travel.',
+      phases: [ { type: 'fwd', segs: [[0, 17.83], [32, 53.45], [-32, 72.55], [0, 31.85]] }, { type: 'rev', limit: 400 } ] } },
   'WB-67': { feasible: false, dumpsterMoved: false, stopOnHit: ['building', 'east strip (ramp / pad, 11\' wide)', 'detention basin'], note: 'No collision-free maneuver found in this yard — not with a single swing, not with a pull-up. Best attempt shown (pull in, back 33\', pull up, back again): it reaches the back wall 27\' from the door with the trailer 40° across the yard.',
-    phases: [ { type: 'fwd', segs: [[0, 13.9], [25.29, 49.11], [-16.07, 53.62]] }, { type: 'rev', limit: 33.03 }, { type: 'fwd', segs: [[-10.69, 51.34]] }, { type: 'rev', limit: 400 } ] },
+    phases: [ { type: 'fwd', segs: [[0, 13.9], [25.29, 49.11], [-16.07, 53.62]] }, { type: 'rev', limit: 33.03 }, { type: 'fwd', segs: [[-10.69, 51.34]] }, { type: 'rev', limit: 400 } ],
+    withEasement: { feasible: false, dumpsterMoved: false, stopOnHit: ['building', 'east strip (ramp / pad, 11\' wide)', 'detention basin'], note: 'Even with the 5\' easement the 53\' still cannot be docked — the extra width helps in the alley, but the swing room in the back yard is what binds. Best attempt (pull in, back 62\', pull up at full lock, back again) reaches the wall 33\' from the door.',
+      phases: [ { type: 'fwd', segs: [[0, 17.74], [27.6, 46.8], [-12.8, 71.9]] }, { type: 'rev', limit: 62.16 }, { type: 'fwd', segs: [[32, 27.81]] }, { type: 'rev', limit: 400 } ] } },
 };
 
 // start positions: tractor rear axle (x, z) and heading (radians, 0 = toward the street, π = toward the back)
@@ -39,7 +43,7 @@ export const STARTS = {
 export function createTruckTool({ scene, camera, controls, onStatus }) {
   let V = VEHICLES['WB-67'], vid = 'WB-67', startId = 'alley';
   const S0 = STARTS[startId];
-  const s = { active: false, x: S0.x, z: S0.z, th: S0.th, psi: S0.th, phi: 0, v: 0, keys: {}, follow: true, dist: 0, hits: [] };
+  const s = { active: false, x: S0.x, z: S0.z, th: S0.th, psi: S0.th, phi: 0, v: 0, keys: {}, follow: true, dist: 0, hits: [], easement: false };
   const group = new THREE.Group(); group.visible = false; scene.add(group);
 
   const matTractor = new THREE.MeshStandardMaterial({ color: '#2f5aa8', roughness: 0.5, metalness: 0.3 });
@@ -83,12 +87,13 @@ export function createTruckTool({ scene, camera, controls, onStatus }) {
   function checkHits(c) {
     const hits = new Set();
     const A = BLDG.A, B = BLDG.B, bs = SITE.basin, D = SITE.dumpster, pc = SITE.corners;
+    const zs = pc.SE[1] + (s.easement && SITE.easementWest ? SITE.easementWest.width : 0);   // west limit, wider with the easement
     const inRect = (p, x0, x1, z0, z1) => p.x >= x0 && p.x <= x1 && p.z >= z0 && p.z <= z1;
     for (const p of [...c.tractor, ...c.trailer]) {
       if (inRect(p, B.x0, A.x1, A.z0, A.z1)) hits.add('building');
       if (((p.x - bs.cx) / bs.rx) ** 2 + ((p.z - bs.cz) / bs.rz) ** 2 < 1) hits.add('detention basin');
       if (D && inRect(p, D.x - D.w / 2 - 1, D.x + D.w / 2 + 1, D.z - D.d / 2 - 1, D.z + D.d / 2 + 1)) hits.add('dumpster');
-      if (p.x < pc.NE[0] && (p.z < pc.NE[1] || p.z > pc.SE[1] || p.x < pc.SW[0])) hits.add('property line / fence');
+      if (p.x < pc.NE[0] && (p.z < pc.NE[1] || p.z > zs || p.x < pc.SW[0])) hits.add(s.easement && p.z > pc.SE[1] ? 'beyond the easement' : 'property line / fence');
       if (p.x < A.x1 + 1 && p.x > B.x0 - 1 && p.z < A.z0 && p.z > pc.NE[1]) hits.add('east strip (ramp / pad, 11\' wide)');
       for (const n of SITE.neighbors) if (inRect(p, n.x0, n.x1, n.z0, n.z1)) hits.add(n.name);
     }
@@ -271,5 +276,5 @@ export function createTruckTool({ scene, camera, controls, onStatus }) {
   function stopAuto() { auto.plan = null; auto.done = true; s.v = 0; }
 
   applyVehicle();
-  return { state: s, setActive, key, update, reset, setVehicle, playPlan, autoUpdate, runPlanInstant, stopAuto, get autoRunning() { return !!auto.plan && !auto.done; }, get autoResult() { return auto.result; }, get vehicle() { return vid; }, get start() { return startId; }, get active() { return s.active; }, set follow(v) { s.follow = v; }, get follow() { return s.follow; } };
+  return { state: s, setActive, key, update, reset, setVehicle, playPlan, autoUpdate, runPlanInstant, stopAuto, get autoRunning() { return !!auto.plan && !auto.done; }, get autoResult() { return auto.result; }, get vehicle() { return vid; }, get start() { return startId; }, get active() { return s.active; }, set follow(v) { s.follow = v; }, get follow() { return s.follow; }, set easement(v) { s.easement = !!v; s.hits = checkHits(corners()); status(); }, get easement() { return s.easement; } };
 }

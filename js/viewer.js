@@ -234,10 +234,15 @@ truckBtn.addEventListener('click', () => setTruck(!truck.active));
 document.getElementById('truck-reset').addEventListener('click', () => { truck.reset(document.getElementById('truck-start').value); setDumpsterVisible(true); if (truck.active) frameTruck(); });
 document.getElementById('truck-start').addEventListener('change', e => { truck.reset(e.target.value); if (!truck.active) setTruck(true); else frameTruck(); });
 document.getElementById('truck-follow').addEventListener('change', e => { truck.follow = e.target.checked; });
+document.getElementById('truck-easement').addEventListener('change', e => { truck.easement = e.target.checked; updateAutoNote(); });
 document.getElementById('truck-type').addEventListener('change', e => { truck.setVehicle(e.target.value); if (!truck.active) setTruck(true); updateAutoNote(); });
 const autoNote = document.getElementById('truck-auto-note');
+function activePlan() {
+  const base = DOCK_PLANS[truck.vehicle]; if (!base) return null;
+  return (truck.easement && base.withEasement) ? base.withEasement : base;
+}
 function updateAutoNote() {
-  const p = DOCK_PLANS[truck.vehicle];
+  const p = activePlan();
   autoNote.textContent = p ? (p.feasible ? '✓ ' : '✗ ') + p.note : '';
   autoNote.style.color = p && p.feasible ? '#9fd8a8' : '#ff9d8f';
 }
@@ -246,7 +251,7 @@ function setDumpsterVisible(v) {
   current.layers.site.traverse(o => { if (o.isMesh && Math.abs(o.position.x - D.x) < 7 && Math.abs(o.position.z - D.z) < 7 && o.position.y < 8) o.visible = v; });
 }
 document.getElementById('truck-auto').addEventListener('click', () => {
-  const p = DOCK_PLANS[truck.vehicle]; if (!p) return;
+  const p = activePlan(); if (!p) return;
   if (!truck.active) setTruck(true);
   setDumpsterVisible(!p.dumpsterMoved);
   truck.playPlan(p); frameTruck();

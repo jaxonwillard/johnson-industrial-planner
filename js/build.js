@@ -707,6 +707,22 @@ function buildSite(version) {
   }
   pts.push(pts[0].clone());
   const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), MAT.propLine); line.computeLineDistances(); line.userData = { layer: 'site' }; g.add(line);
+  // proposed easement line on the west neighbor's side (dotted, offset from the fence)
+  const E = SITE.easementWest;
+  if (E) {
+    const ze = c.SE[1] + E.width;
+    const ept = [];
+    const n = Math.max(2, Math.round((E.x1 - E.x0) / 6));
+    for (let k = 0; k <= n; k++) { const x = E.x0 + (E.x1 - E.x0) * k / n; ept.push(new THREE.Vector3(x, gradeAt(x) + 0.35, ze)); }
+    MAT.easeLine = MAT.easeLine || new THREE.LineDashedMaterial({ color: '#2f6fe0', dashSize: 1.5, gapSize: 1.5 });
+    const el = new THREE.Line(new THREE.BufferGeometry().setFromPoints(ept), MAT.easeLine); el.computeLineDistances(); el.userData = { layer: 'site' }; g.add(el);
+    // a faint tinted strip so the 5' reads on the ground too
+    MAT.easeFill = MAT.easeFill || new THREE.MeshBasicMaterial({ color: '#2f6fe0', transparent: true, opacity: 0.12, depthWrite: false, side: THREE.DoubleSide });
+    const strip = terrainRect(E.x0, E.x1, c.SE[1], ze, 0.12, MAT.easeFill, { seg: 6 });
+    tag(strip, E.name, [['Width', `${E.width}'`], ['Along', `the west fence, ${(E.x1 - E.x0).toFixed(0)}' from the back line to the front of the building`]], 'Would need the neighbor\'s agreement (recorded access easement). The truck tool has a switch to treat this strip as drivable.', 'site');
+    g.add(strip);
+    g.add(label(`5' easement (proposed)`, (E.x0 + E.x1) / 2 - 60, gy((E.x0 + E.x1) / 2 - 60, 1.5), ze + 4, 'lbl dim'));
+  }
   g.add(label(`${SITE.lineLengths.north}'`, 30, gy(30, 1), -52, 'lbl dim'));
   g.add(label(`${SITE.lineLengths.south}'`, 30, gy(30, 1), 56, 'lbl dim'));
   g.add(label(`${SITE.lineLengths.east}'`, 279, gy(279, 1), 2, 'lbl dim'));

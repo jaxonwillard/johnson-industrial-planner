@@ -89,6 +89,8 @@ export const SITE = {
     { a: [121.2, 36.5],  b: [121.2, 52],  h: 6, gate: true, name: 'Gate — west side (front)' },
   ],
   dumpster: null,     // owner: no dumpster in the model (the 2004 plan showed one at x −95, z −26 in the back-east corner)
+  // Proposed access easement on the west neighbor's land: a strip this wide along our west fence line
+  easementWest: { width: 5, x0: -203.5, x1: 121.2, name: 'Proposed 5\' access easement (Graphic Design side)' },
   poles: [ [268, -46], [268, 50] ],
   treesOffsite: Array.from({ length: 9 }, (_, i) => [-222 - (i % 2) * 6, -44 + i * 12]),
   treesFront: [ [200, -44], [240, -45] ],
