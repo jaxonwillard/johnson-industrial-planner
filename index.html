@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2009 Johnson Industrial Blvd — Planner</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="index.html"><span class="dot"></span>2009 Johnson Industrial Blvd</a>
+  <nav>
+    <a class="active" href="index.html">Home</a>
+    <a href="viewer.html">3D Model</a>
+    <a href="budget.html">Budget</a>
+  </nav>
+</header>
+
+<main class="page">
+  <section class="hero">
+    <div class="card">
+      <h1>2009 Johnson Industrial Blvd</h1>
+      <div class="sub">Nolensville, TN 37135 · Parcel 056L D 020.00 000 · 1.11 ac · CD-01</div>
+      <div class="facts">
+        <div><b>Building</b>15,560 SF · 72' × ~195'</div>
+        <div><b>Suite A</b>Original, 121' + 2-story office</div>
+        <div><b>Suite B</b>2006 Kirby, 73.5', crane bay</div>
+        <div><b>Heights</b>18' eave · 21' peak · 1:12</div>
+        <div><b>Crane</b>EMH 5-ton · 65' span</div>
+        <div><b>Loading</b>Back dock door + drive-in bay −4'</div>
+        <div><b>Power</b>3-phase · 1200A + 400A</div>
+        <div><b>Fire</b>Sprinklered (2006)</div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>How the site fits</h3>
+      <div class="preview" id="site-preview">
+        <svg viewBox="0 0 560 150" xmlns="http://www.w3.org/2000/svg" font-family="system-ui" font-size="9">
+          <rect x="1" y="1" width="558" height="148" fill="#eef2f6"/>
+          <!-- parcel: X from -211 .. 274 ft → 0..485 → scale 1.1 px/ft, origin at x=232px -->
+          <polygon points="0,20 535,20 535,130 8,130" fill="#d9e3cf" stroke="#b8321f" stroke-dasharray="4 2"/>
+          <rect x="365" y="30" width="155" height="100" fill="#8f8f8c"/>
+          <rect x="30" y="18" width="130" height="114" fill="#c8c2b5"/>
+          <ellipse cx="22" cy="75" rx="14" ry="45" fill="#7e9a5a"/>
+          <rect x="152" y="33" width="81" height="79" fill="#f2f1ea" stroke="#333"/>
+          <rect x="232" y="33" width="133" height="79" fill="#f2f1ea" stroke="#333"/>
+          <rect x="338" y="33" width="27" height="79" fill="#e9dfc7" stroke="#333"/>
+          <rect x="213" y="91" width="20" height="21" fill="#a9a8a2" stroke="#333"/>
+          <rect x="540" y="0" width="20" height="150" fill="#5a5b59"/>
+          <text x="190" y="76" text-anchor="middle">Suite B</text>
+          <text x="290" y="76" text-anchor="middle">Suite A</text>
+          <text x="351" y="76" text-anchor="middle" font-size="7">office</text>
+          <text x="440" y="82" text-anchor="middle" fill="#fff">front lot</text>
+          <text x="95" y="82" text-anchor="middle" fill="#333">rear yard</text>
+          <text x="550" y="78" text-anchor="middle" fill="#fff" transform="rotate(-90 550 78)">Johnson Industrial</text>
+          <text x="20" y="144" fill="#666" font-size="8">NW (true north is this way)</text>
+          <text x="500" y="144" fill="#666" font-size="8" text-anchor="end">SE — street</text>
+        </svg>
+      </div>
+      <p class="hint" style="margin:10px 0 0">Long, narrow lot: ~153' of paved lot in front, the 195' building, then ~135' of gravel yard and the detention basin behind. The ground falls ~4' from front to back, so the slab is at grade at the entry and dock-height at the back. Neighbors: Case Lumber (east) and Graphic Design (west).</p>
+    </div>
+  </section>
+
+  <section class="versions">
+    <div class="card vcard" style="--vc:#5b8def">
+      <h2>Original (as-is)</h2>
+      <p>The property as it stands: original 72' × 121' metal building with the two-story office block up front, the 2006 Kirby crane bay behind it with a dock door and a depressed drive-in bay on the back wall, gravel back yard 4' below the slab.</p>
+      <div class="actions">
+        <a class="btn primary" href="viewer.html?v=original">Open 3D model</a>
+        <a class="btn" href="budget.html?v=original">Carrying costs</a>
+      </div>
+    </div>
+    <div class="card vcard" style="--vc:#e8913a">
+      <h2>Office Remodel</h2>
+      <p>New street façade — owner-supplied windows and a two-story storefront, new wall panels — plus a refresh of the 3,600 SF office block: floors, ceilings, LED, paint, restroom. Priced options for the rest. Target ≈ $100k.</p>
+      <div class="actions">
+        <a class="btn primary" href="viewer.html?v=office">Open 3D model</a>
+        <a class="btn" href="budget.html?v=office">Working budget</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="two-col">
+    <div class="card">
+      <h3>Using the 3D model</h3>
+      <ol class="steps">
+        <li>Left-drag to orbit, right-drag to pan, scroll to zoom.</li>
+        <li>Use the <b>Views</b> buttons (or keys 1–0) to jump to the street, rear, inside each suite, the truck well, or the office floors.</li>
+        <li>Turn on <b>Section cut</b> (key C) and drag the slider to slice the roof off at any height — the office-floor views do this for you.</li>
+        <li>Click anything — a wall, door, the crane, a parking surface — for its dimensions and the source note.</li>
+        <li>Switch versions with the pills at the top right; the budget page follows the same version.</li>
+      </ol>
+    </div>
+    <div class="card docs">
+      <h3>Source documents</h3>
+      <ul>
+        <li><a href="../Site%20Plan.pdf" target="_blank">Site grading &amp; drainage plan<small>McKinney Engineering · Mar/Jun 2004 · scale 1"=20'</small></a></li>
+        <li><a href="../Ceiling%20Height%20Drawing.pdf" target="_blank">Kirby cross-section, frame line 1<small>Kirby Building Systems · job 530612 · 2004</small></a></li>
+        <li><a href="../2009%20Johnson%20Industrial%20Blvd%20-%20Updated%201.pdf" target="_blank">Listing flyer<small>CORE Real Estate · photos, aerials, suite summary</small></a></li>
+      </ul>
+      <p class="hint" style="margin-top:12px">Everything in the model is driven by <code>planner/data/property.js</code>; budget lines by <code>planner/data/budget.js</code>. Change a number there and reload.</p>
+    </div>
+  </section>
+
+  <footer class="foot">Built from the 2004 civil and Kirby drawings, the CORE flyer and owner answers. Dimensions ±2' where scaled from the plan; see "Assumptions &amp; sources" in the viewer.</footer>
+</main>
+<script>
+  // On the public (GitHub Pages) copy the source PDFs are not published — show their names without links.
+  if (/github\.io$/.test(location.hostname)) {
+    document.querySelectorAll('.docs li a').forEach(a => {
+      const span = document.createElement('span'); span.innerHTML = a.innerHTML + '<small>(not published — on the local copy only)</small>';
+      span.style.cssText = 'display:block;padding:12px 14px;border:1px dashed var(--line);border-radius:10px;color:var(--muted)';
+      a.replaceWith(span);
+    });
+  }
+</script>
+</body>
+</html>

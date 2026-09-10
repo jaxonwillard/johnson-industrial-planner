@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Budget — 2009 Johnson Industrial Blvd</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="index.html"><span class="dot"></span>2009 Johnson Industrial Blvd</a>
+  <nav>
+    <a href="index.html">Home</a>
+    <a id="model-link" href="viewer.html">3D Model</a>
+    <a class="active" href="budget.html">Budget</a>
+  </nav>
+  <div class="version-pills">
+    <a href="budget.html?v=original" data-version="original">Original</a>
+    <a href="budget.html?v=office" data-version="office">Office Remodel</a>
+  </div>
+</header>
+
+<main class="page">
+  <div class="budget-head">
+    <div>
+      <h1 id="b-title"></h1>
+      <p class="hint" id="b-intro" style="max-width:760px;margin:6px 0 0"></p>
+    </div>
+    <div class="controls">
+      <label id="target-wrap">Target $ <input type="number" id="target" step="1000"></label>
+      <label>Contingency % <input type="number" id="contingency" step="1" style="width:70px"></label>
+      <label id="owner-wrap"><input type="checkbox" id="owner-pricing"> Use owner-supplied pricing</label>
+      <button id="export" class="btn">Export CSV</button>
+      <button id="reset" class="btn">Reset edits</button>
+    </div>
+  </div>
+
+  <div class="summary" id="summary"></div>
+
+  <div class="legend">
+    <span>✓ = in the budget · unchecked lines are priced options</span>
+    <span>Qty and unit costs are editable — edits are saved in this browser</span>
+    <span>Mid = average of low and high</span>
+  </div>
+
+  <div style="overflow-x:auto">
+  <table class="budget">
+    <thead>
+      <tr><th></th><th>Item</th><th class="num">Qty</th><th>Unit</th><th class="num">Unit low</th><th class="num">Unit high</th><th class="num">Line (mid)</th><th>Notes</th></tr>
+    </thead>
+    <tbody id="rows"></tbody>
+    <tfoot id="foot"></tfoot>
+  </table>
+  </div>
+
+  <p class="foot-note">Planning-level numbers for Middle Tennessee, September 2026; not bids. Lines marked "at your cost" separate labor (editable) from material you supply — flip the owner-pricing toggle to see what the same scope costs at market. Quantities come from the 3D model (<code>data/property.js</code>); unit costs live in <code>data/budget.js</code>.</p>
+</main>
+<script type="module" src="js/budget.js"></script>
+</body>
+</html>

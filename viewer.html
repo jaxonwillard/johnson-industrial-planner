@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3D Model — 2009 Johnson Industrial Blvd</title>
+<link rel="stylesheet" href="css/style.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three/three.module.js",
+    "three/addons/": "./vendor/three/addons/"
+  }
+}
+</script>
+<script>
+  // Friendly diagnostics instead of a blank canvas if the 3D engine can't start.
+  (function () {
+    function show(msg) {
+      var el = document.getElementById('load-error'); if (!el) return;
+      el.innerHTML = msg; el.style.display = 'block';
+    }
+    window.addEventListener('DOMContentLoaded', function () {
+      if (location.protocol === 'file:') {
+        show('<b>Opened as a file.</b> Browsers block the 3D engine on <code>file://</code> pages. Close this tab and double-click <code>planner\\serve.bat</code> instead — it opens <code>http://localhost:8080/planner/</code>.');
+      }
+    });
+    window.addEventListener('error', function (e) {
+      if (window.__viewerReady) return;
+      show('<b>The 3D viewer hit an error while starting.</b><br><code>' + (e.message || 'Failed to load ' + (e.target && e.target.src || 'a script')) + '</code><br>Make sure you opened the page through <code>serve.bat</code> (http://localhost:8080/planner/). If it still fails, press F12 → Console and send me what it says.');
+    }, true);
+    setTimeout(function () {
+      if (!window.__viewerReady && location.protocol !== 'file:') {
+        show('<b>The 3D engine did not start.</b> Open the page through <code>serve.bat</code> (http://localhost:8080/planner/), not by double-clicking the file. Press F12 → Console for details.');
+      }
+    }, 6000);
+  })();
+</script>
+</head>
+<body class="viewer">
+<div id="load-error" style="display:none;position:fixed;left:50%;top:70px;transform:translateX(-50%);z-index:50;max-width:640px;background:#fff3e6;color:#5a3a12;border:1px solid #e8b787;border-radius:10px;padding:14px 18px;font-size:14px;line-height:1.5;box-shadow:0 10px 30px rgba(0,0,0,.25)"></div>
+<header class="topbar">
+  <a class="brand" href="index.html"><span class="dot"></span>2009 Johnson Industrial Blvd</a>
+  <nav>
+    <a href="index.html">Home</a>
+    <a class="active" href="viewer.html">3D Model</a>
+    <a id="budget-link" href="budget.html">Budget</a>
+  </nav>
+  <div class="version-pills">
+    <button data-version="original">Original</button>
+    <button data-version="office">Office Remodel</button>
+  </div>
+  <button id="panel-toggle" class="icon-btn" title="Toggle panels">☰</button>
+</header>
+
+<main class="viewer-main">
+  <aside class="panel left" id="left-panel">
+    <section>
+      <h3>Version</h3>
+      <div id="version-name" class="version-name"></div>
+      <p id="version-blurb" class="blurb"></p>
+    </section>
+    <section>
+      <h3>Views <span class="kbd-hint">keys 1–0</span></h3>
+      <div class="btn-grid">
+        <button data-view="aerial">Aerial</button>
+        <button data-view="plan">Plan</button>
+        <button data-view="street">Front (street)</button>
+        <button data-view="rear">Back</button>
+        <button data-view="ne">East side</button>
+        <button data-view="sw">West side</button>
+        <button data-view="officeG">Office — ground</button>
+        <button data-view="officeU">Office — upstairs</button>
+        <button data-view="insideA">Inside Suite A</button>
+        <button data-view="insideB">Inside Suite B</button>
+        <button data-view="well">Drive-in bay</button>
+        <button data-view="pad">East pad &amp; ramp</button>
+      </div>
+      <button id="walk-btn" class="walk-btn">🚶 Walk mode <span class="kbd-hint">F</span></button>
+      <p class="hint" style="margin:6px 0 0">WASD move · mouse look · Shift run · E / Q up or down a floor · Esc or F to exit</p>
+    </section>
+    <section>
+      <h3>Semi turning template <span class="kbd-hint">T</span></h3>
+      <div class="row-between">
+        <button id="truck-btn" class="walk-btn" style="margin-top:0;width:auto;flex:1">🚛 Drive a semi</button>
+        <button id="truck-reset" class="link-btn" title="back to the start position">Reset</button>
+      </div>
+      <label class="row" style="margin-top:6px">Vehicle
+        <select id="truck-type" class="sel">
+          <option value="WB-67">WB-67 — 53' trailer, 73½' overall</option>
+          <option value="WB-50">WB-50 — ~40' trailer, 55' overall</option>
+          <option value="WB-40">WB-40 — 33' trailer, 45½' overall</option>
+        </select>
+      </label>
+      <label class="row" style="margin-top:6px">Start
+        <select id="truck-start" class="sel">
+          <option value="alley">West alley, at the back corner</option>
+          <option value="yard">Back yard, facing the dock</option>
+          <option value="street">On the street, lot on the right</option>
+        </select>
+      </label>
+      <label class="row" style="margin-top:6px"><input type="checkbox" id="truck-follow" checked> Camera follows the truck</label>
+      <button id="truck-auto" class="walk-btn" style="margin-top:8px">▶ Auto-dock this truck</button>
+      <p class="hint" id="truck-auto-note" style="margin:6px 0 0"></p>
+      <p class="hint" style="margin:6px 0 0">↑ ↓ drive (hold) · ← → steer · Shift creep. Turns red when it hits something.</p>
+      <div id="truck-status" class="truck-status"></div>
+    </section>
+    <section>
+      <h3>Measure <span class="kbd-hint">M</span></h3>
+      <div class="row-between">
+        <button id="measure-btn" class="walk-btn" style="margin-top:0;width:auto;flex:1">📏 Tape measure</button>
+        <button id="measure-clear" class="link-btn">Clear</button>
+      </div>
+      <p class="hint" style="margin:6px 0 0">Click a start point, then an end point. Esc cancels a half-made measurement.</p>
+      <div id="measure-list" class="measure-list"></div>
+    </section>
+    <section>
+      <h3>Layers</h3>
+      <div class="check-grid">
+        <label><input type="checkbox" data-layer="roof"> Roof <span class="kbd-hint">R</span></label>
+        <label><input type="checkbox" data-layer="walls"> Walls</label>
+        <label><input type="checkbox" data-layer="doors"> Doors / glazing</label>
+        <label><input type="checkbox" data-layer="structure"> Steel frames</label>
+        <label><input type="checkbox" data-layer="interior"> Interior</label>
+        <label><input type="checkbox" data-layer="crane"> Crane</label>
+        <label><input type="checkbox" data-layer="site"> Site</label>
+        <label><input type="checkbox" data-layer="neighbors"> Neighbors</label>
+        <label><input type="checkbox" data-layer="labels"> Labels</label>
+      </div>
+    </section>
+    <section>
+      <h3>Section cut <span class="kbd-hint">C</span></h3>
+      <label class="row"><input type="checkbox" id="cut-toggle"> Cut everything above <strong id="cut-val">12.0 ft</strong></label>
+      <input type="range" id="cut-range" min="2" max="26" step="0.5" value="12">
+    </section>
+    <section class="row-between">
+      <label><input type="checkbox" id="shadow-toggle" checked> Shadows</label>
+      <button id="assumptions-btn" class="link-btn">Assumptions &amp; sources</button>
+    </section>
+    <p class="hint" id="measure-hint"></p>
+  </aside>
+
+  <div id="canvas-wrap"></div>
+  <div id="walk-hud" hidden>
+    <div class="crosshair"></div>
+    <div class="walk-tip" id="walk-tip">WASD move · mouse look · Shift run · E/Q change floor · Esc or F to exit</div>
+    <div class="walk-resume" id="walk-resume" hidden>Paused — <b>click</b> to keep walking, or press <b>F</b> to exit walk mode</div>
+  </div>
+
+  <aside class="panel right" id="right-panel">
+    <h2 id="info-title"></h2>
+    <div id="info-body"></div>
+  </aside>
+</main>
+
+<dialog id="assumptions">
+  <h3>Assumptions &amp; sources</h3>
+  <ul></ul>
+  <p class="hint">Sources: McKinney Engineering site grading plan (2004), Kirby Building Systems cross-section job 530612 (2004), CORE Real Estate flyer, owner answers (Sept 2026). Edit <code>data/property.js</code> to change anything.</p>
+  <form method="dialog"><button class="primary">Close</button></form>
+</dialog>
+
+<script type="module" src="js/viewer.js"></script>
+</body>
+</html>
