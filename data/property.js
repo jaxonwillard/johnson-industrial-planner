@@ -88,7 +88,7 @@ export const SITE = {
     { a: [121.2, -36.5], b: [121.2, -48], h: 6, gate: true, name: 'Gate — east side (front)' },
     { a: [121.2, 36.5],  b: [121.2, 52],  h: 6, gate: true, name: 'Gate — west side (front)' },
   ],
-  dumpster: { x: -95, z: -26, w: 8, d: 6, h: 5, screenH: 6 },
+  dumpster: null,     // owner: no dumpster in the model (the 2004 plan showed one at x −95, z −26 in the back-east corner)
   poles: [ [268, -46], [268, 50] ],
   treesOffsite: Array.from({ length: 9 }, (_, i) => [-222 - (i % 2) * 6, -44 + i * 12]),
   treesFront: [ [200, -44], [240, -45] ],

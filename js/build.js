@@ -721,11 +721,14 @@ function buildSite(version) {
     const p = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.6, 38, 8), MAT.pole); p.position.set(x, gradeAt(x) + 19, z); p.castShadow = true; p.userData = { layer: 'site' }; g.add(p);
     const arm = box(0.4, 0.4, 8, MAT.pole, x, gradeAt(x) + 34, z); arm.userData = { layer: 'site' }; g.add(arm);
   }
-  // dumpster with screening
-  const D = SITE.dumpster, dy = gradeAt(D.x);
-  const dm = box(D.w, D.h, D.d, MAT.dumpster, D.x, dy + D.h / 2, D.z); tag(dm, 'Dumpster w/ screening', [['Location', 'Back yard, per 2004 plan']], '', 'site'); g.add(dm);
-  for (const seg of [[D.x - D.w / 2 - 1, D.x + D.w / 2 + 1, D.z - D.d / 2 - 1, D.z - D.d / 2 - 0.7], [D.x - D.w / 2 - 1, D.x - D.w / 2 - 0.7, D.z - D.d / 2 - 1, D.z + D.d / 2 + 1], [D.x + D.w / 2 + 0.7, D.x + D.w / 2 + 1, D.z - D.d / 2 - 1, D.z + D.d / 2 + 1]]) {
-    const s = box(seg[1] - seg[0], D.screenH, seg[3] - seg[2], MAT.screen, (seg[0] + seg[1]) / 2, dy + D.screenH / 2, (seg[2] + seg[3]) / 2); s.userData = { layer: 'site' }; g.add(s);
+  // dumpster with screening (only if the data still has one)
+  const D = SITE.dumpster;
+  if (D) {
+    const dy = gradeAt(D.x);
+    const dm = box(D.w, D.h, D.d, MAT.dumpster, D.x, dy + D.h / 2, D.z); tag(dm, 'Dumpster w/ screening', [['Location', 'Back yard, per 2004 plan']], '', 'site'); g.add(dm);
+    for (const seg of [[D.x - D.w / 2 - 1, D.x + D.w / 2 + 1, D.z - D.d / 2 - 1, D.z - D.d / 2 - 0.7], [D.x - D.w / 2 - 1, D.x - D.w / 2 - 0.7, D.z - D.d / 2 - 1, D.z + D.d / 2 + 1], [D.x + D.w / 2 + 0.7, D.x + D.w / 2 + 1, D.z - D.d / 2 - 1, D.z + D.d / 2 + 1]]) {
+      const s = box(seg[1] - seg[0], D.screenH, seg[3] - seg[2], MAT.screen, (seg[0] + seg[1]) / 2, dy + D.screenH / 2, (seg[2] + seg[3]) / 2); s.userData = { layer: 'site' }; g.add(s);
+    }
   }
   // trees
   const tree = (x, z, s = 1) => {

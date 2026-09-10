@@ -23,9 +23,9 @@ const JACKKNIFE = THREE.MathUtils.degToRad(85);
 export const DOCK_PLANS = {
   'WB-40': { feasible: true, dumpsterMoved: false, note: 'Single swing: pull in 12\', swing right, counter-steer left, straighten, then back to the door. ~209\' of travel, yard as-is.',
     phases: [ { type: 'fwd', segs: [[0, 11.84], [26.7, 48.03], [-27.4, 76.42], [-5.78, 15.99]] }, { type: 'rev', limit: 400 } ] },
-  'WB-50': { feasible: true, dumpsterMoved: true, note: 'Single swing, but only with the dumpster out of the back-east corner — with it in place the best attempt ends 11½\' off the door. ~221\' of travel.',
+  'WB-50': { feasible: true, dumpsterMoved: false, note: 'Single swing using the whole yard width — swing right, hard left, straighten 23\', then back ~100\' to the door. ~221\' of travel. (Needs the back-east corner clear: a dumpster there put the best attempt 11½\' off the door.)',
     phases: [ { type: 'fwd', segs: [[0, 17.23], [29.6, 57.02], [-32, 75.84], [14.77, 22.97]] }, { type: 'rev', limit: 400 } ] },
-  'WB-67': { feasible: false, dumpsterMoved: true, stopOnHit: ['building', 'east strip (ramp / pad, 11\' wide)', 'detention basin'], note: 'No collision-free maneuver found in this yard — not with a single swing, not with a pull-up, not with the dumpster moved. Best attempt shown (pull in, back 33\', pull up, back again): it binds on the building.',
+  'WB-67': { feasible: false, dumpsterMoved: false, stopOnHit: ['building', 'east strip (ramp / pad, 11\' wide)', 'detention basin'], note: 'No collision-free maneuver found in this yard — not with a single swing, not with a pull-up. Best attempt shown (pull in, back 33\', pull up, back again): it reaches the back wall 27\' from the door with the trailer 40° across the yard.',
     phases: [ { type: 'fwd', segs: [[0, 13.9], [25.29, 49.11], [-16.07, 53.62]] }, { type: 'rev', limit: 33.03 }, { type: 'fwd', segs: [[-10.69, 51.34]] }, { type: 'rev', limit: 400 } ] },
 };
 
@@ -89,7 +89,7 @@ export function createTruckTool({ scene, camera, controls, onStatus }) {
     for (const p of [...c.tractor, ...c.trailer]) {
       if (inRect(p, B.x0, A.x1, A.z0, A.z1)) hits.add('building');
       if (((p.x - bs.cx) / bs.rx) ** 2 + ((p.z - bs.cz) / bs.rz) ** 2 < 1) hits.add('detention basin');
-      if (inRect(p, D.x - D.w / 2 - 1, D.x + D.w / 2 + 1, D.z - D.d / 2 - 1, D.z + D.d / 2 + 1)) hits.add('dumpster');
+      if (D && inRect(p, D.x - D.w / 2 - 1, D.x + D.w / 2 + 1, D.z - D.d / 2 - 1, D.z + D.d / 2 + 1)) hits.add('dumpster');
       if (p.x < pc.NE[0] && (p.z < pc.NE[1] || p.z > pc.SE[1] || p.x < pc.SW[0])) hits.add('property line / fence');
       if (p.x < A.x1 + 1 && p.x > B.x0 - 1 && p.z < A.z0 && p.z > pc.NE[1]) hits.add('east strip (ramp / pad, 11\' wide)');
       for (const n of SITE.neighbors) if (inRect(p, n.x0, n.x1, n.z0, n.z1)) hits.add(n.name);

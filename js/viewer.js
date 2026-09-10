@@ -242,7 +242,7 @@ function updateAutoNote() {
   autoNote.style.color = p && p.feasible ? '#9fd8a8' : '#ff9d8f';
 }
 function setDumpsterVisible(v) {
-  const D = SITE.dumpster;
+  const D = SITE.dumpster; if (!D) return;
   current.layers.site.traverse(o => { if (o.isMesh && Math.abs(o.position.x - D.x) < 7 && Math.abs(o.position.z - D.z) < 7 && o.position.y < 8) o.visible = v; });
 }
 document.getElementById('truck-auto').addEventListener('click', () => {
